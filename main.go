@@ -1,38 +1,37 @@
 package main
 
 import (
-	"fmt"
+	"image/color"
+	"math"
+	"math/rand"
 	"time"
 )
 
-type _Point struct {
-	X, Y, Z float64
-}
+var (
+	precision = int(math.Log10(float64(spaceResolution))) - 1
 
-func reprPoint(p _Point) {
-	fmt.Printf("X: %.5f\n", p.X)
-	fmt.Printf("Y: %.5f\n", p.Y)
-	fmt.Printf("Z: %.5f\n", p.Z)
-}
-func plus(p, q _Point, r *_Point) {
-	r.X = p.X + q.X
-	r.Y = p.Y + q.Y
-	r.Z = p.Z + q.Z
-}
+	colorWhite = color.RGBA{255, 255, 255, 255}
+	colorBlack = color.RGBA{0, 0, 0, 255}
+	colorRed   = color.RGBA{255, 0, 0, 255}
+	colorGreen = color.RGBA{0, 255, 0, 255}
+	colorBlue  = color.RGBA{0, 0, 255, 255}
+	colorTeal  = color.RGBA{0, 200, 200, 255}
+)
+
+const (
+	spaceResolution = 1000
+	vertexesCount   = 5
+)
 
 func init() {
-
+	rand.Seed(time.Now().Unix())
 }
 
 func main() {
-	p1 := _Point{1, 2, 3}
-	p2 := _Point{2, 3, 4}
-	c := _Point{0, 0, 0}
-	d := _Point{0, 0, 0}
-	go plus(p1, p2, &c)
-	go plus(p2, p1, &d)
-	time.Sleep(1 * time.Second)
-	reprPoint(c)
-	reprPoint(d)
+	img := Canvas{}
+	img.Create("map.png")
+	defer img.SavePNG()
 
+	pol := generatePolygon()
+	pol.Draw(img.canvas, colorBlue)
 }
