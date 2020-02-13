@@ -11,16 +11,6 @@ type Segment struct {
 	p1, p2 Point
 }
 
-// CrossProduct is calc a cross product of vectors
-func CrossProduct(s1, s2 Segment) Point {
-	v1 := s1.Vector()
-	v2 := s2.Vector()
-	return Point{
-		v1.Y*v2.Z - v1.Z*v2.Y,
-		v1.Z*v2.X - v1.X*v2.Z,
-		v1.X*v2.Y - v1.Y*v2.X}
-}
-
 // IsPointBelongLine return True if point belongs to line
 func (s *Segment) IsPointBelongLine(p Point) bool {
 	deltaX := s.p2.X - s.p1.X
@@ -116,9 +106,35 @@ func (s *Segment) Draw(canvas *image.RGBA, color color.RGBA) {
 }
 
 // Vector return coordinates of vector of line "s"
-func (s *Segment) Vector() Point {
-	return Point{
+func (s *Segment) Vector() Vector {
+	vectorCoordinates := Point{
 		s.p1.X - s.p2.X,
 		s.p1.Y - s.p2.Y,
 		s.p1.Z - s.p2.Z}
+	return Vector{vectorCoordinates}
+}
+
+func generateSegment() Segment {
+	p1 := generatePoint()
+	p2 := generatePoint()
+
+	for p1.CheckCompare(p2) == true {
+		p2 = generatePoint()
+	}
+	return Segment{p1, p2}
+}
+
+// CheckIntersection is for intersection of s and s2
+func (s *Segment) CheckIntersection(s2 Segment) bool {
+	seg1, seg2, seg3 := Segment{s.p1, s.p2}, Segment{s.p1, s2.p1}, Segment{s.p1, s2.p2}
+	v1, v2, v3 := seg1.Vector(), seg2.Vector(), seg3.Vector()
+	a := sign(PseudoDotProduct(v1, v2))
+	b := sign(PseudoDotProduct(v1, v3))
+
+	seg4, seg5, seg6 := Segment{s2.p1, s2.p2}, Segment{s2.p1, s.p1}, Segment{s2.p1, s.p2}
+	v4, v5, v6 := seg4.Vector(), seg5.Vector(), seg6.Vector()
+	c := sign(PseudoDotProduct(v4, v5))
+	d := sign(PseudoDotProduct(v4, v6))
+
+	return a*b < 0 && c*d < 0
 }
